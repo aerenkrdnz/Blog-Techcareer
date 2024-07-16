@@ -1,0 +1,18 @@
+﻿@model ArticleInfoDto
+
+<h2>Makale Detayları</h2>
+
+<div>
+    <h3>@Model.Title</h3>
+    <p><strong>Yazar:</strong> @Model.UserName</p>
+    <p>@Model.Content</p>
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <p><img src="/images/articles/@Model.ImageUrl" alt="@Model.Title" style="max-width: 500px;" /></p>
+    }
+    else
+    {
+        <p><img src="/images/no-images.png" alt="No Image" style="max-width: 500px;" /></p>
+    }
+    <a href="@Url.Action("Index", "Article")" class="btn btn-secondary">Geri Dön</a>
+</div>

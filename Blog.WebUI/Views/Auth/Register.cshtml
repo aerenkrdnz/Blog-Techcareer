@@ -1,0 +1,59 @@
+﻿@model RegisterViewModel
+<div class="row">
+
+	<div class="col-6 offset-3" style="padding-top:50px">
+
+		<div class="card">
+
+			<div class="card-header fw-bold fs-5">
+				Hesap
+			</div>
+
+			<div class="card-body">
+				<form method="post" asp-controller="Auth" asp-action="Register">
+
+					@if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+					{
+						<div class="alert alert-danger fw-bold">
+							@ViewBag.ErrorMessage
+						</div>
+					}
+
+					<div class="mt-2">
+						<label class="required" asp-for="FirstName"></label>
+						<input asp-for="FirstName" type="text" class="form-control" />
+						<span class="text-danger mt-1 fw-bold" asp-validation-for="FirstName"></span>
+					</div>
+					<div class="mt-2">
+						<label class="required" asp-for="LastName"></label>
+						<input asp-for="LastName" type="text" class="form-control" />
+						<span class="text-danger mt-1 fw-bold" asp-validation-for="LastName"></span>
+					</div>
+					<div class="mt-2">
+						<label class="required" asp-for="Email"></label>
+						<input asp-for="Email" type="email" class="form-control" />
+						<span class="text-danger mt-1 fw-bold" asp-validation-for="Email"></span>
+					</div>
+					<div class="mt-2">
+						<label class="required" asp-for="Password"></label>
+						<input asp-for="Password" type="password" class="form-control" />
+						<span class="text-danger mt-1 fw-bold" asp-validation-for="Password"></span>
+					</div>
+					<div class="mt-2">
+						<label class="required" asp-for="PasswordConfirm"></label>
+						<input asp-for="PasswordConfirm" type="password" class="form-control" />
+						<span class="text-danger mt-1 fw-bold" asp-validation-for="PasswordConfirm"></span>
+					</div>
+					<button type="submit" class="btn btn-primary mt-3 form-control fw-bold">Kayıt Ol</button>
+				</form>
+
+			</div>
+
+		</div>
+
+
+
+	</div>
+
+
+</div>
