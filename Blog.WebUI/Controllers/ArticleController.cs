@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.WebUI.Controllers
 {
-    [Authorize(Roles = "User")]
+    
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;
@@ -24,13 +24,13 @@ namespace Blog.WebUI.Controllers
             _logger = logger;
             _environment = environment;
         }
-
+        [Authorize(Roles = "User")]
         [HttpGet]
         public IActionResult Create()
         {
             return View(new AddArticleViewModel());
         }
-
+        [Authorize(Roles = "User")]
         [HttpPost]
         public IActionResult Create(AddArticleViewModel viewModel)
         {
@@ -112,7 +112,7 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
         }
-
+        [Authorize(Roles = "User")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -132,7 +132,7 @@ namespace Blog.WebUI.Controllers
             ViewBag.ImagePath = article.ImageUrl;
             return View(editDto);
         }
-
+        [Authorize(Roles = "User")]
         [HttpPost]
         public IActionResult Edit(AddArticleViewModel viewModel, int id)
         {
@@ -191,7 +191,7 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
         }
-
+        [Authorize(Roles = "User")]
         public IActionResult Index()
         {
             var articles = _articleService.GetAllArticles();

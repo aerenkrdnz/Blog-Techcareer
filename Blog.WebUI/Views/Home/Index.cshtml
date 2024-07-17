@@ -1,5 +1,43 @@
 ﻿@model List<ArticleInfoDto>
 
+<style>
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: transform 0.2s;
+        height: 100%;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+    .card-img-top {
+        height: 300px;
+        object-fit: cover;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        margin-top: auto;
+    }
+
+    .card-body {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        
+    }
+
+    .btn-primary {
+        margin-top: auto;
+        width: 100%;
+    }
+</style>
 
 <div class="row">
     @foreach (var article in Model)
@@ -9,7 +47,6 @@
                 <img src="~/images/articles/@article.ImageUrl" class="card-img-top" alt="Article Image">
                 <div class="card-body">
                     <h5 class="card-title">@article.Title</h5>
-                    <p class="card-text">@article.Content</p>
                     <a asp-controller="Article" asp-action="Details" asp-route-id="@article.Id" class="btn btn-primary">Daha Fazla</a>
                 </div>
             </div>
