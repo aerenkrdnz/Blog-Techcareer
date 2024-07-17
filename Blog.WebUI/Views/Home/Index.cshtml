@@ -1,1 +1,18 @@
-﻿
+﻿@model List<ArticleInfoDto>
+
+
+<div class="row">
+    @foreach (var article in Model)
+    {
+        <div class="col-md-4 mb-4 mt-2">
+            <div class="card">
+                <img src="~/images/articles/@article.ImageUrl" class="card-img-top" alt="Article Image">
+                <div class="card-body">
+                    <h5 class="card-title">@article.Title</h5>
+                    <p class="card-text">@article.Content</p>
+                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.Id" class="btn btn-primary">Daha Fazla</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

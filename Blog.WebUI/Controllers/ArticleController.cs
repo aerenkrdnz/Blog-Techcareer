@@ -7,9 +7,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.WebUI.Controllers
 {
+    [Authorize(Roles = "User")]
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;
@@ -57,7 +59,7 @@ namespace Blog.WebUI.Controllers
             var userId = int.Parse(userIdClaim.Value);
             _logger.LogInformation($"Kullanıcı ID: {userId}");
 
-            var newFileName = "no-image.png";
+            var newFileName = "no-images.png";
 
             if (viewModel.File is not null)
             {
@@ -139,7 +141,7 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
 
-            var newFileName = viewModel.ImageUrl ?? "no-image.png"; 
+            var newFileName = viewModel.ImageUrl ?? "no-images.png"; 
 
             if (viewModel.File is not null)
             {
@@ -206,7 +208,7 @@ namespace Blog.WebUI.Controllers
 
             if (string.IsNullOrEmpty(article.ImageUrl))
             {
-                article.ImageUrl = "no-image.png";
+                article.ImageUrl = "no-images.png";
             }
 
             return View(article);

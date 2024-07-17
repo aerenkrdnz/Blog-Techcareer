@@ -1,4 +1,4 @@
-﻿@model Blog.WebUI.Models.AddArticleViewModel
+﻿@model AddArticleViewModel
 
 <h2>Makale Düzenle</h2>
 
@@ -21,14 +21,16 @@
     <div class="form-group">
         <label asp-for="File" class="control-label"></label>
         <input type="file" asp-for="File" class="form-control" />
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <input type="hidden" asp-for="ImageUrl" />
+            <div class="mt-2">
+                <img src="~/images/articles/@Model.ImageUrl" alt="@Model.Title" style="max-width: 200px;" />
+            </div>
+        }
         <span asp-validation-for="File" class="text-danger"></span>
     </div>
-    @if (ViewBag.ImagePath != null)
-    {
-        <div class="form-group">
-            <img src="/images/articles/@ViewBag.ImagePath" alt="@Model.Title" style="max-width: 200px;" />
-        </div>
-    }
+
     <div class="form-group">
         <input type="submit" value="Kaydet" class="btn btn-primary" />
     </div>
