@@ -34,7 +34,7 @@
     {
         <h4>Yorum Yap</h4>
         <form asp-action="Add" asp-controller="Comment" method="post">
-            <div class="form-group">
+            <div class="form-group mt-2">
                 <label for="Content" class="control-label">Yorum</label>
                 <textarea id="Content" name="Content" class="form-control"></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
@@ -50,4 +50,4 @@
         <p>Yorum yapmak için giriş yapmanız gerekiyor.</p>
     }
 </div>
-<a href="@Url.Action("Index", "Article")" class="btn btn-secondary">Geri Dön</a>
+<a asp-action="Index" asp-controller="Article" class="btn btn-secondary">Geri Dön</a>

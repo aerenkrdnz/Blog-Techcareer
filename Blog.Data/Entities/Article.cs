@@ -13,10 +13,11 @@ namespace Blog.Data.Entities
         public string Content { get; set; }
         public string ImageUrl { get; set; }
         public int UserId { get; set; }
+        //Relational Property
         public User User { get; set; }
         public ICollection<Comment> Comments { get; set; }
+        public ICollection<ArticleTag> ArticleTags { get; set; }
     }
-
 
     public class ArticleConfiguration : BaseConfiguration<Article>
     {
@@ -34,7 +35,12 @@ namespace Blog.Data.Entities
                 .WithMany()
                 .HasForeignKey(x => x.UserId);
 
+            builder.HasMany(x => x.ArticleTags)
+                .WithOne(at => at.Article)
+                .HasForeignKey(at => at.ArticleId);
+
             base.Configure(builder);
         }
     }
+
 }

@@ -2,9 +2,24 @@
 
 <h2>Makale Listesi</h2>
 
-<div class="text-end mb-3">
-    <a asp-action="Create" asp-controller="Article" class="btn btn-success">Makale Oluştur</a>
-</div>
+<form asp-action="Search" method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="searchTerm" class="form-control" placeholder="Ara..." />
+        <button class="btn btn-primary" type="submit">Ara</button>
+    </div>
+</form>
+
+<form asp-action="FilterByTag" method="get" class="mb-3">
+    <div class="input-group">
+        <select name="tagId" class="form-select">
+            @foreach (var tag in ViewBag.Tags as List<TagInfoDto>)
+            {
+                <option value="@tag.Id">@tag.Name</option>
+            }
+        </select>
+        <button class="btn btn-primary" type="submit">Filtrele</button>
+    </div>
+</form>
 
 <table class="table">
     <thead>
@@ -12,6 +27,7 @@
             <th>Başlık</th>
             <th>Yazar</th>
             <th>İçerik</th>
+            <th>Etiketler</th>
             <th>İşlemler</th>
         </tr>
     </thead>
@@ -23,8 +39,14 @@
                 <td>@article.UserName</td>
                 <td>@(article.Content.Length > 50 ? article.Content.Substring(0, 50) + "..." : article.Content)</td>
                 <td>
+                    @foreach (var tag in article.TagNames)
+                    {
+                        <span class="badge bg-primary">@tag</span>
+                    }
+                </td>
+                <td>
                     <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-info">Detay</a>
-                    @if (User.IsInRole("Admin") || User.FindFirst(ClaimTypes.NameIdentifier).Value == article.UserId.ToString())
+                    @if (User.IsInRole("Admin") || article.UserId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
                     {
                         <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>
                         <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Sil</a>

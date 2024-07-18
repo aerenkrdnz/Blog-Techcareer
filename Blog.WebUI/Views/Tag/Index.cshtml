@@ -1,0 +1,23 @@
+﻿@model List<TagInfoDto>
+
+<h2>Etiket Listesi</h2>
+
+<div class="text-end mb-3">
+    <a asp-action="Create" class="btn btn-success">Etiket Ekle</a>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Etiket Adı</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tag in Model)
+        {
+            <tr>
+                <td>@tag.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

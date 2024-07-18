@@ -17,6 +17,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<IArticleService, ArticleManager>();
 builder.Services.AddScoped<ICommentService, CommentManager>();
+builder.Services.AddScoped<ITagService, TagManager>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

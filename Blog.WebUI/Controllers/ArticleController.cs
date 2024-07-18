@@ -11,25 +11,31 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.WebUI.Controllers
 {
-
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;
         private readonly ICommentService _commentService;
+        private readonly ITagService _tagService;
         private readonly ILogger<ArticleController> _logger;
         private readonly IWebHostEnvironment _environment;
 
-        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment, ICommentService commentService)
+        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment, ICommentService commentService, ITagService tagService)
         {
             _articleService = articleService;
             _logger = logger;
             _environment = environment;
             _commentService = commentService;
+            _tagService = tagService;
         }
+
         [Authorize(Roles = "User,Admin")]
         public IActionResult Create()
         {
-            return View(new AddArticleViewModel());
+            var model = new AddArticleViewModel
+            {
+                AllTags = _tagService.GetAllTags()
+            };
+            return View(model);
         }
 
         [Authorize(Roles = "User,Admin")]
@@ -40,6 +46,7 @@ namespace Blog.WebUI.Controllers
 
             if (!ModelState.IsValid)
             {
+                viewModel.AllTags = _tagService.GetAllTags();
                 _logger.LogWarning("Model durumu geçerli değil.");
                 return View(viewModel);
             }
@@ -74,6 +81,7 @@ namespace Blog.WebUI.Controllers
                 if (!allowedFileTypes.Contains(fileContentType) || !allowedFileExtensions.Contains(fileExtension))
                 {
                     ViewBag.ErrorMessage = "Desteklenmeyen dosya türü.";
+                    viewModel.AllTags = _tagService.GetAllTags();
                     return View(viewModel);
                 }
 
@@ -96,7 +104,8 @@ namespace Blog.WebUI.Controllers
                 Title = viewModel.Title,
                 Content = viewModel.Content,
                 ImageUrl = newFileName,
-                UserId = userId
+                UserId = userId,
+                TagIds = viewModel.SelectedTagIds
             };
 
             var result = _articleService.AddArticle(formData);
@@ -110,6 +119,7 @@ namespace Blog.WebUI.Controllers
             else
             {
                 _logger.LogError($"Makale oluşturma hatası: {result.Message}");
+                viewModel.AllTags = _tagService.GetAllTags();
                 ViewBag.ErrorMessage = result.Message;
                 return View(viewModel);
             }
@@ -123,21 +133,15 @@ namespace Blog.WebUI.Controllers
             if (article == null)
             {
                 return RedirectToAction("Index");
-            }
-
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
-            {
-                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
-                return RedirectToAction("Index");
-            }
+            }         
 
             var editDto = new AddArticleViewModel()
             {
                 Title = article.Title,
                 Content = article.Content,
-                ImageUrl = article.ImageUrl
+                ImageUrl = article.ImageUrl,
+                SelectedTagIds = article.TagIds,
+                AllTags = _tagService.GetAllTags()
             };
 
             ViewBag.ImagePath = article.ImageUrl;
@@ -152,18 +156,11 @@ namespace Blog.WebUI.Controllers
             if (article == null)
             {
                 return RedirectToAction("Index");
-            }
-
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
-            {
-                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
-                return RedirectToAction("Index");
-            }
+            }           
 
             if (!ModelState.IsValid)
             {
+                viewModel.AllTags = _tagService.GetAllTags();
                 return View(viewModel);
             }
 
@@ -180,6 +177,7 @@ namespace Blog.WebUI.Controllers
                 if (!allowedFileTypes.Contains(fileContentType) || !allowedFileExtensions.Contains(fileExtension))
                 {
                     ViewBag.ErrorMessage = "Desteklenmeyen dosya türü.";
+                    viewModel.AllTags = _tagService.GetAllTags();
                     return View(viewModel);
                 }
 
@@ -202,7 +200,8 @@ namespace Blog.WebUI.Controllers
                 Id = id,
                 Title = viewModel.Title,
                 Content = viewModel.Content,
-                ImageUrl = newFileName
+                ImageUrl = newFileName,
+                TagIds = viewModel.SelectedTagIds
             };
 
             var result = _articleService.UpdateArticle(formData, id);
@@ -213,6 +212,7 @@ namespace Blog.WebUI.Controllers
             }
             else
             {
+                viewModel.AllTags = _tagService.GetAllTags();
                 ViewBag.ErrorMessage = result.Message;
                 return View(viewModel);
             }
@@ -238,13 +238,7 @@ namespace Blog.WebUI.Controllers
                 return RedirectToAction("Index");
             }
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
-            {
-                ViewBag.ErrorMessage = "Bu makaleyi silme yetkiniz yok.";
-                return RedirectToAction("Index");
-            }
+           
 
             var result = _articleService.DeleteArticle(id);
 
@@ -259,7 +253,6 @@ namespace Blog.WebUI.Controllers
             }
         }
 
-       
         public IActionResult Details(int id)
         {
             var article = _articleService.GetArticleById(id);
@@ -279,5 +272,18 @@ namespace Blog.WebUI.Controllers
             return View(article);
         }
 
+        [HttpGet]
+        public IActionResult Search(string searchTerm)
+        {
+            var articles = _articleService.SearchArticles(searchTerm);
+            return View("Index", articles);
+        }
+
+        [HttpGet]
+        public IActionResult FilterByTag(int tagId)
+        {
+            var articles = _articleService.FilterArticlesByTag(tagId);
+            return View("Index", articles);
+        }
     }
 }

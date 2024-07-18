@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using Blog.Business.Dtos.TagDtos;
 
 namespace Blog.WebUI.Models
 {
@@ -18,5 +21,11 @@ namespace Blog.WebUI.Models
         public IFormFile? File { get; set; }
 
         public string? ImageUrl { get; set; }
+
+        public List<int> SelectedTagIds { get; set; } = new List<int>();
+
+        public List<TagInfoDto> AllTags { get; set; } = new List<TagInfoDto>();
+
+        public SelectList TagsSelectList => new SelectList(AllTags, "Id", "Name");
     }
 }

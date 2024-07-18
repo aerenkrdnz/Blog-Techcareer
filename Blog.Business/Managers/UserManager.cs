@@ -6,10 +6,6 @@ using Blog.Data.Enums;
 using Blog.Data.Repositories;
 using Microsoft.AspNetCore.DataProtection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Blog.Business.Managers
 {
@@ -17,11 +13,13 @@ namespace Blog.Business.Managers
     {
         private readonly IRepository<User> _userRepository;
         private readonly IDataProtector _dataProtector;
+
         public UserManager(IRepository<User> userRepository, IDataProtectionProvider dataProtectionProvider)
         {
             _userRepository = userRepository;
             _dataProtector = dataProtectionProvider.CreateProtector("security");
         }
+
         public ServiceMessage AddUser(AddUserDto addUserDto)
         {
             var hasMail = _userRepository.GetAll(x => x.Email.ToLower() == addUserDto.Email.ToLower()).ToList();
@@ -33,6 +31,7 @@ namespace Blog.Business.Managers
                     Message = "Bu Eposta adresli bir kullanıcı zaten mevcut."
                 };
             }
+
             var entity = new User()
             {
                 Email = addUserDto.Email,
@@ -41,12 +40,12 @@ namespace Blog.Business.Managers
                 Password = _dataProtector.Protect(addUserDto.Password),
                 UserType = UserTypeEnum.User
             };
+
             _userRepository.Add(entity);
 
             return new ServiceMessage()
             {
                 IsSucceed = true,
-
             };
         }
 
@@ -57,6 +56,7 @@ namespace Blog.Business.Managers
             {
                 return null;
             }
+
             var rawPassword = _dataProtector.Unprotect(userEntity.Password);
             if (rawPassword == loginDto.Password)
             {
@@ -67,12 +67,50 @@ namespace Blog.Business.Managers
                     FirstName = userEntity.FirstName,
                     LastName = userEntity.LastName,
                     UserType = userEntity.UserType,
+                    ProfileImageUrl = userEntity.ProfileImageUrl
                 };
             }
             else
             {
                 return null;
             }
+        }
+
+        public UserInfoDto GetUserById(int id)
+        {
+            var user = _userRepository.Get(x => x.Id == id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserInfoDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserType = user.UserType,
+                ProfileImageUrl = user.ProfileImageUrl
+            };
+        }
+
+        public ServiceMessage UpdateUser(UpdateUserDto updateUserDto)
+        {
+            var user = _userRepository.Get(x => x.Id == updateUserDto.Id);
+            if (user == null)
+            {
+                return new ServiceMessage() { IsSucceed = false, Message = "Kullanıcı Bulunamadı." };
+            }
+
+            user.FirstName = updateUserDto.FirstName;
+            user.LastName = updateUserDto.LastName;
+            user.Email = updateUserDto.Email;
+            user.ProfileImageUrl = updateUserDto.ProfileImageUrl;
+
+            _userRepository.Update(user);
+
+            return new ServiceMessage() { IsSucceed = true };
         }
     }
 }

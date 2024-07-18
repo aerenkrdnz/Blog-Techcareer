@@ -4,6 +4,7 @@ using Blog.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Blog.Data.Migrations
 {
     [DbContext(typeof(BlogContext))]
-    partial class BlogContextModelSnapshot : ModelSnapshot
+    [Migration("20240718115421_add_tag_and_articletag")]
+    partial class add_tag_and_articletag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,7 +162,7 @@ namespace Blog.Data.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("Blog.Data.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -195,11 +198,6 @@ namespace Blog.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfileImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
                     b.Property<int>("UserType")
                         .HasColumnType("int");
 
@@ -210,7 +208,7 @@ namespace Blog.Data.Migrations
 
             modelBuilder.Entity("Blog.Data.Entities.Article", b =>
                 {
-                    b.HasOne("User", "User")
+                    b.HasOne("Blog.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -246,7 +244,7 @@ namespace Blog.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("User", "User")
+                    b.HasOne("Blog.Data.Entities.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -269,7 +267,7 @@ namespace Blog.Data.Migrations
                     b.Navigation("ArticleTags");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("Blog.Data.Entities.User", b =>
                 {
                     b.Navigation("Comments");
                 });

@@ -12,5 +12,7 @@ namespace Blog.Business.Services
     {
         ServiceMessage AddUser(AddUserDto addUserDto);
         UserInfoDto LoginUser(LoginDto loginDto);
+        UserInfoDto GetUserById(int id);
+        ServiceMessage UpdateUser(UpdateUserDto updateUserDto);
     }
 }

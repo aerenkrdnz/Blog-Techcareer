@@ -30,9 +30,12 @@
         }
         <span asp-validation-for="File" class="text-danger"></span>
     </div>
-
     <div class="form-group">
+        <label class="control-label">Etiketler</label>
+        <select asp-for="SelectedTagIds" class="form-control" asp-items="Model.TagsSelectList" multiple="multiple"></select>
+    </div>
+    <div class="form-group mt-2">
         <input type="submit" value="Kaydet" class="btn btn-primary" />
     </div>
 </form>
-<a href="@Url.Action("Index", "Article")" class="btn btn-secondary">Geri Dön</a>
+<a asp-action="Index" asp-controller="Article" class="btn btn-secondary">Geri Dön</a>
