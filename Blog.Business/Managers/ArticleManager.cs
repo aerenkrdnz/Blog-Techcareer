@@ -49,7 +49,8 @@ namespace Blog.Business.Managers
                 Title = article.Title,
                 Content = article.Content,
                 ImageUrl = article.ImageUrl,
-                UserName = article.User.FirstName + " " + article.User.LastName
+                UserName = article.User.FirstName + " " + article.User.LastName,
+                UserId = article.UserId 
             }).ToList();
 
             return articles;
@@ -72,7 +73,8 @@ namespace Blog.Business.Managers
                 Title = article.Title,
                 Content = article.Content,
                 ImageUrl = article.ImageUrl,
-                UserName = article.User.FirstName + " " + article.User.LastName
+                UserName = article.User.FirstName + " " + article.User.LastName,
+                UserId = article.UserId 
             };
         }
 
@@ -107,5 +109,22 @@ namespace Blog.Business.Managers
 
             return new ServiceMessage() { IsSucceed = true };
         }
+
+        public List<ArticleInfoDto> GetArticlesByUserId(int userId)
+        {
+            var articles = _articleRepository.GetAll(a => a.UserId == userId).Select(article => new ArticleInfoDto
+            {
+                Id = article.Id,
+                Title = article.Title,
+                Content = article.Content,
+                ImageUrl = article.ImageUrl,
+                UserName = article.User.FirstName + " " + article.User.LastName,
+                UserId = article.UserId
+            }).ToList();
+
+            return articles;
+        }
+
+
     }
 }

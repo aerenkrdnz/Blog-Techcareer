@@ -19,13 +19,16 @@
         @foreach (var article in Model)
         {
             <tr>
-                <td>@(article.Title.Length > 10 ? article.Title.Substring(0, 10)  + "..." : article.Title)</td>
+                <td>@(article.Title.Length > 10 ? article.Title.Substring(0, 10) + "..." : article.Title)</td>
                 <td>@article.UserName</td>
                 <td>@(article.Content.Length > 50 ? article.Content.Substring(0, 50) + "..." : article.Content)</td>
                 <td>
                     <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-info">Detay</a>
-                    <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Sil</a>
+                    @if (User.IsInRole("Admin") || User.FindFirst(ClaimTypes.NameIdentifier).Value == article.UserId.ToString())
+                    {
+                        <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>
+                        <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Sil</a>
+                    }
                 </td>
             </tr>
         }

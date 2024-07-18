@@ -16,13 +16,14 @@ builder.Services.AddDbContext<BlogContext>(options =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<IArticleService, ArticleManager>();
+builder.Services.AddScoped<ICommentService, CommentManager>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = new PathString("/Account/Login");
-        options.LogoutPath = new PathString("/Account/Logout");
-        options.AccessDeniedPath = new PathString("/Account/AccessDenied");
+        options.LoginPath = new PathString("/Auth/Login");
+        options.LogoutPath = new PathString("/Auth/Logout");
+        options.AccessDeniedPath = new PathString("/Auth/AccessDenied");
     });
 
 

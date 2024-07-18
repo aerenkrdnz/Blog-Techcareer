@@ -18,6 +18,12 @@ namespace Blog.WebUI.Controllers
         }
 
         [HttpGet]
+        [Route("Auth/AccessDenied")]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        [HttpGet]
         [Route("KayitOl")]
         public IActionResult Register()
         {

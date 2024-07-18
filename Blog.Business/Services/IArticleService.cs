@@ -11,5 +11,8 @@ namespace Blog.Business.Services
         ArticleInfoDto GetArticleById(int id);
         ServiceMessage UpdateArticle(UpdateArticleDto updateArticleDto, int id);
         ServiceMessage DeleteArticle(int id);
+        List<ArticleInfoDto> GetArticlesByUserId(int userId);
+
+
     }
 }

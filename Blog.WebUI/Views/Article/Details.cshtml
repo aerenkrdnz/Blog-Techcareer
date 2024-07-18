@@ -14,5 +14,40 @@
     {
         <p><img src="/images/no-images.png" alt="No Image" style="max-width: 500px;" /></p>
     }
-    <a href="@Url.Action("Index", "Article")" class="btn btn-secondary">Geri Dön</a>
+
+    <h4>Yorumlar</h4>
+    <div>
+        @foreach (var comment in ViewBag.Comments as List<CommentInfoDto>)
+        {
+            <p><strong>@comment.UserName:</strong> @comment.Content</p>
+            @if (User.IsInRole("Admin") || (User.Identity.IsAuthenticated && User.FindFirst(ClaimTypes.NameIdentifier).Value == comment.UserId.ToString()))
+            {
+                <form asp-action="Delete" asp-controller="Comment" method="post">
+                    <input type="hidden" name="id" value="@comment.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">Yorumu Sil</button>
+                </form>
+            }
+        }
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h4>Yorum Yap</h4>
+        <form asp-action="Add" asp-controller="Comment" method="post">
+            <div class="form-group">
+                <label for="Content" class="control-label">Yorum</label>
+                <textarea id="Content" name="Content" class="form-control"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <input type="hidden" name="ArticleId" value="@Model.Id" />
+            <div class="form-group">
+                <input type="submit" value="Yorum Yap" class="btn btn-primary" />
+            </div>
+        </form>
+    }
+    else
+    {
+        <p>Yorum yapmak için giriş yapmanız gerekiyor.</p>
+    }
 </div>
+<a href="@Url.Action("Index", "Article")" class="btn btn-secondary">Geri Dön</a>

@@ -15,7 +15,9 @@ namespace Blog.Data.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public UserTypeEnum UserType { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
+
     public class UserConfiguration : BaseConfiguration<User>
     {
         public override void Configure(EntityTypeBuilder<User> builder)
@@ -27,8 +29,8 @@ namespace Blog.Data.Entities
             builder.Property(x => x.Email)
                 .HasMaxLength(52);
             base.Configure(builder);
-
         }
     }
+
 
 }

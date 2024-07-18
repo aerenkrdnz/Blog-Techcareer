@@ -11,26 +11,28 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Blog.WebUI.Controllers
 {
-    
+
     public class ArticleController : Controller
     {
         private readonly IArticleService _articleService;
+        private readonly ICommentService _commentService;
         private readonly ILogger<ArticleController> _logger;
         private readonly IWebHostEnvironment _environment;
 
-        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment)
+        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment, ICommentService commentService)
         {
             _articleService = articleService;
             _logger = logger;
             _environment = environment;
+            _commentService = commentService;
         }
-        [Authorize(Roles = "User")]
-        [HttpGet]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Create()
         {
             return View(new AddArticleViewModel());
         }
-        [Authorize(Roles = "User")]
+
+        [Authorize(Roles = "User,Admin")]
         [HttpPost]
         public IActionResult Create(AddArticleViewModel viewModel)
         {
@@ -112,13 +114,22 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
         }
-        [Authorize(Roles = "User")]
+
+        [Authorize(Roles = "User,Admin")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
             var article = _articleService.GetArticleById(id);
             if (article == null)
             {
+                return RedirectToAction("Index");
+            }
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (!User.IsInRole("Admin") && article.UserId != userId)
+            {
+                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
                 return RedirectToAction("Index");
             }
 
@@ -132,16 +143,31 @@ namespace Blog.WebUI.Controllers
             ViewBag.ImagePath = article.ImageUrl;
             return View(editDto);
         }
-        [Authorize(Roles = "User")]
+
+        [Authorize(Roles = "User,Admin")]
         [HttpPost]
         public IActionResult Edit(AddArticleViewModel viewModel, int id)
         {
+            var article = _articleService.GetArticleById(id);
+            if (article == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (!User.IsInRole("Admin") && article.UserId != userId)
+            {
+                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
+                return RedirectToAction("Index");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(viewModel);
             }
 
-            var newFileName = viewModel.ImageUrl ?? "no-images.png"; 
+            var newFileName = viewModel.ImageUrl ?? "no-images.png";
 
             if (viewModel.File is not null)
             {
@@ -191,14 +217,20 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
         }
-        [Authorize(Roles = "User")]
+
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
         {
-            var articles = _articleService.GetAllArticles();
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var articles = User.IsInRole("Admin")
+                ? _articleService.GetAllArticles()
+                : _articleService.GetArticlesByUserId(userId);
+
             return View(articles);
         }
 
-        public IActionResult Details(int id)
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Delete(int id)
         {
             var article = _articleService.GetArticleById(id);
             if (article == null)
@@ -206,16 +238,14 @@ namespace Blog.WebUI.Controllers
                 return RedirectToAction("Index");
             }
 
-            if (string.IsNullOrEmpty(article.ImageUrl))
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+            if (!User.IsInRole("Admin") && article.UserId != userId)
             {
-                article.ImageUrl = "no-images.png";
+                ViewBag.ErrorMessage = "Bu makaleyi silme yetkiniz yok.";
+                return RedirectToAction("Index");
             }
 
-            return View(article);
-        }
-
-        public IActionResult Delete(int id)
-        {
             var result = _articleService.DeleteArticle(id);
 
             if (result.IsSucceed)
@@ -228,5 +258,26 @@ namespace Blog.WebUI.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+       
+        public IActionResult Details(int id)
+        {
+            var article = _articleService.GetArticleById(id);
+            if (article == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var comments = _commentService.GetCommentsByArticleId(id);
+            ViewBag.Comments = comments;
+
+            if (string.IsNullOrEmpty(article.ImageUrl))
+            {
+                article.ImageUrl = "no-images.png";
+            }
+
+            return View(article);
+        }
+
     }
 }

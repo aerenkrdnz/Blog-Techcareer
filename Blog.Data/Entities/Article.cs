@@ -14,7 +14,9 @@ namespace Blog.Data.Entities
         public string ImageUrl { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }
+        public ICollection<Comment> Comments { get; set; }
     }
+
 
     public class ArticleConfiguration : BaseConfiguration<Article>
     {
