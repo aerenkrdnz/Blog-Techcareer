@@ -19,6 +19,11 @@ namespace Blog.WebUI.Extensions
         {
             return user.Claims.FirstOrDefault(x => x.Type == "lastName")?.Value;
         }
+        public static string GetUserProfileImageUrl(this ClaimsPrincipal user)
+        {
+            return user.Claims.FirstOrDefault(x => x.Type == "profileImageUrl")?.Value;
+        }
+
         public static bool IsAdmin(this ClaimsPrincipal user)
         {
             if (user.Claims.FirstOrDefault(x => x.Type == "userType")?.Value == "Admin")

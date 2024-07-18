@@ -40,17 +40,21 @@ namespace Blog.Business.Managers
 
             _articleRepository.Add(entity);
 
-            foreach (var tagId in addArticleDto.TagIds)
+            if (addArticleDto.TagIds != null)
             {
-                _articleTagRepository.Add(new ArticleTag
+                foreach (var tagId in addArticleDto.TagIds)
                 {
-                    ArticleId = entity.Id,
-                    TagId = tagId
-                });
+                    _articleTagRepository.Add(new ArticleTag
+                    {
+                        ArticleId = entity.Id,
+                        TagId = tagId
+                    });
+                }
             }
 
             return new ServiceMessage() { IsSucceed = true };
         }
+
 
         public List<ArticleInfoDto> GetAllArticles()
         {
@@ -125,17 +129,21 @@ namespace Blog.Business.Managers
                 _articleTagRepository.Delete(existingTag);
             }
 
-            foreach (var tagId in updateArticleDto.TagIds)
+            if (updateArticleDto.TagIds != null)
             {
-                _articleTagRepository.Add(new ArticleTag
+                foreach (var tagId in updateArticleDto.TagIds)
                 {
-                    ArticleId = article.Id,
-                    TagId = tagId
-                });
+                    _articleTagRepository.Add(new ArticleTag
+                    {
+                        ArticleId = article.Id,
+                        TagId = tagId
+                    });
+                }
             }
 
             return new ServiceMessage() { IsSucceed = true };
         }
+
 
         public ServiceMessage DeleteArticle(int id)
         {

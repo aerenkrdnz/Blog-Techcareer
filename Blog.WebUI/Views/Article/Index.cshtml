@@ -34,7 +34,7 @@
                     }
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-info">Detay</a>
+                    <a asp-action="Details" asp-route-id="@article.Id" asp-route-title="@article.Title.Replace(" ", "-").Replace("'", "").ToLower()" class="btn btn-info">Detay</a>
                     @if (User?.IsInRole("Admin") == true || (User?.Identity?.IsAuthenticated == true && article.UserId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
                     {
                         <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>

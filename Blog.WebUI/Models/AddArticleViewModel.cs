@@ -22,10 +22,8 @@ namespace Blog.WebUI.Models
 
         public string? ImageUrl { get; set; }
 
+        public List<SelectListItem> AllTags { get; set; } = new List<SelectListItem>();
         public List<int> SelectedTagIds { get; set; } = new List<int>();
-
-        public List<TagInfoDto> AllTags { get; set; } = new List<TagInfoDto>();
-
         public SelectList TagsSelectList => new SelectList(AllTags, "Id", "Name");
     }
 }

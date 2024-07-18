@@ -28,7 +28,7 @@
         <select asp-for="SelectedTagIds" class="form-control" multiple>
             @foreach (var tag in Model.AllTags)
             {
-                <option value="@tag.Id">@tag.Name</option>
+                <option value="@tag.Value">@tag.Text</option>
             }
         </select>
         <span asp-validation-for="SelectedTagIds" class="text-danger"></span>

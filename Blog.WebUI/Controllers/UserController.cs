@@ -101,6 +101,7 @@ namespace Blog.WebUI.Controllers
 
             if (result.IsSucceed)
             {
+                TempData["SuccessMessage"] = "Profil başarıyla güncellendi.";
                 return RedirectToAction("Profile");
             }
             else
@@ -108,6 +109,7 @@ namespace Blog.WebUI.Controllers
                 ViewBag.ErrorMessage = result.Message;
                 return View(model);
             }
+
         }
 
 

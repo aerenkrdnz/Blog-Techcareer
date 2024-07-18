@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Blog.Business.Dtos.TagDtos;
 
 namespace Blog.WebUI.Controllers
 {
@@ -17,20 +19,32 @@ namespace Blog.WebUI.Controllers
         private readonly ICommentService _commentService;
         private readonly ILogger<ArticleController> _logger;
         private readonly IWebHostEnvironment _environment;
+        private readonly ITagService _tagService;
 
-        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment, ICommentService commentService)
+        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger, IWebHostEnvironment environment, ICommentService commentService, ITagService tagService)
         {
             _articleService = articleService;
             _logger = logger;
             _environment = environment;
             _commentService = commentService;
+            _tagService = tagService;
         }
 
         [Authorize(Roles = "User,Admin")]
         public IActionResult Create()
         {
-            return View(new AddArticleViewModel());
+            var tags = _tagService.GetAllTags();
+            var viewModel = new AddArticleViewModel
+            {
+                AllTags = tags.Select(tag => new SelectListItem
+                {
+                    Value = tag.Id.ToString(),
+                    Text = tag.Name
+                }).ToList()
+            };
+            return View(viewModel);
         }
+
 
         [Authorize(Roles = "User,Admin")]
         [HttpPost]
@@ -122,27 +136,36 @@ namespace Blog.WebUI.Controllers
             var article = _articleService.GetArticleById(id);
             if (article == null)
             {
+                _logger.LogWarning($"Article with ID {id} not found.");
                 return RedirectToAction("Index");
             }
-
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
+                       
+            var tags = _tagService.GetAllTags();
+            if (tags == null)
             {
-                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
-                return RedirectToAction("Index");
+                _logger.LogError("Etiketler alınamadı.");
+                tags = new List<TagInfoDto>();
             }
 
-            var editDto = new AddArticleViewModel()
+            var selectedTagIds = article.TagIds ?? new List<int>();
+            var viewModel = new AddArticleViewModel
             {
                 Title = article.Title,
                 Content = article.Content,
-                ImageUrl = article.ImageUrl
+                ImageUrl = article.ImageUrl,
+                SelectedTagIds = selectedTagIds,
+                AllTags = tags.Select(tag => new SelectListItem
+                {
+                    Value = tag.Id.ToString(),
+                    Text = tag.Name,
+                    Selected = selectedTagIds.Contains(tag.Id)
+                }).ToList()
             };
 
             ViewBag.ImagePath = article.ImageUrl;
-            return View(editDto);
+            return View(viewModel);
         }
+
 
         [Authorize(Roles = "User,Admin")]
         [HttpPost]
@@ -152,15 +175,7 @@ namespace Blog.WebUI.Controllers
             if (article == null)
             {
                 return RedirectToAction("Index");
-            }
-
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
-            {
-                ViewBag.ErrorMessage = "Bu makaleyi düzenleme yetkiniz yok.";
-                return RedirectToAction("Index");
-            }
+            }                      
 
             if (!ModelState.IsValid)
             {
@@ -202,7 +217,8 @@ namespace Blog.WebUI.Controllers
                 Id = id,
                 Title = viewModel.Title,
                 Content = viewModel.Content,
-                ImageUrl = newFileName
+                ImageUrl = newFileName,
+                TagIds = viewModel.SelectedTagIds ?? new List<int>() 
             };
 
             var result = _articleService.UpdateArticle(formData, id);
@@ -217,6 +233,7 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
         }
+
 
         [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
@@ -237,14 +254,7 @@ namespace Blog.WebUI.Controllers
             {
                 return RedirectToAction("Index");
             }
-
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-
-            if (!User.IsInRole("Admin") && article.UserId != userId)
-            {
-                ViewBag.ErrorMessage = "Bu makaleyi silme yetkiniz yok.";
-                return RedirectToAction("Index");
-            }
+                      
 
             var result = _articleService.DeleteArticle(id);
 
@@ -259,12 +269,18 @@ namespace Blog.WebUI.Controllers
             }
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(int id, string title)
         {
             var article = _articleService.GetArticleById(id);
             if (article == null)
             {
                 return RedirectToAction("Index");
+            }
+
+            var expectedTitle = article.Title.Replace(" ", "-").Replace("'", "").ToLower();
+            if (title != expectedTitle)
+            {
+                return RedirectToAction("Details", new { id, title = expectedTitle });
             }
 
             var comments = _commentService.GetCommentsByArticleId(id);
@@ -277,5 +293,7 @@ namespace Blog.WebUI.Controllers
 
             return View(article);
         }
+
+
     }
 }

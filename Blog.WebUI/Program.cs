@@ -28,7 +28,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = new PathString("/Auth/AccessDenied");
     });
 
-
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -46,8 +45,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+    name: "articleDetails",
+    pattern: "Article/Details/{id:int}/{title}",
+    defaults: new { controller = "Article", action = "Details" });
 
 app.MapDefaultControllerRoute();
 
