@@ -48,7 +48,8 @@ namespace Blog.Business.Managers
                 Content = comment.Content,
                 UserName = comment.User.FirstName + " " + comment.User.LastName,
                 ArticleId = comment.ArticleId,
-                UserId = comment.UserId
+                UserId = comment.UserId,
+                ProfileImageUrl = comment.User.ProfileImageUrl 
             }).ToList();
 
             return comments;
@@ -70,7 +71,8 @@ namespace Blog.Business.Managers
                 Content = comment.Content,
                 UserName = comment.User.FirstName + " " + comment.User.LastName,
                 ArticleId = comment.ArticleId,
-                UserId = comment.UserId
+                UserId = comment.UserId,
+                ProfileImageUrl = comment.User.ProfileImageUrl 
             };
         }
 
