@@ -18,6 +18,7 @@ builder.Services.AddScoped<IUserService, UserManager>();
 builder.Services.AddScoped<IArticleService, ArticleManager>();
 builder.Services.AddScoped<ICommentService, CommentManager>();
 builder.Services.AddScoped<ITagService, TagManager>();
+builder.Services.AddScoped<IHomeService, HomeManager>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

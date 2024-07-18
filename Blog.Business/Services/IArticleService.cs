@@ -8,9 +8,7 @@ namespace Blog.Business.Services
     {
         ServiceMessage AddArticle(AddArticleDto addArticleDto);
         List<ArticleInfoDto> GetAllArticles();
-        List<ArticleInfoDto> GetArticlesByUserId(int userId);
-        List<ArticleInfoDto> SearchArticles(string searchTerm);
-        List<ArticleInfoDto> FilterArticlesByTag(int tagId);
+        List<ArticleInfoDto> GetArticlesByUserId(int userId);   
         ArticleInfoDto GetArticleById(int id);
         ServiceMessage UpdateArticle(UpdateArticleDto updateArticleDto, int id);
         ServiceMessage DeleteArticle(int id);

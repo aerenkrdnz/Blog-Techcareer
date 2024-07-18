@@ -22,7 +22,7 @@ namespace Blog.WebUI.Controllers
         [HttpGet]
         public IActionResult Profile()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var user = _userService.GetUserById(userId);
 
             if (user == null)
@@ -50,7 +50,13 @@ namespace Blog.WebUI.Controllers
                 return View(model);
             }
 
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var loggedInUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            if (model.Id != loggedInUserId)
+            {
+                ViewBag.ErrorMessage = "Kullanıcı bilgileri uyuşmuyor.";
+                return View(model);
+            }
 
             var newFileName = model.ProfileImageUrl;
 
@@ -103,5 +109,7 @@ namespace Blog.WebUI.Controllers
                 return View(model);
             }
         }
+
+
     }
 }

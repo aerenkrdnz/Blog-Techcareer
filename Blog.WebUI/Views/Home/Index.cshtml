@@ -1,4 +1,4 @@
-﻿@model List<ArticleInfoDto>
+﻿@model HomeViewModel
 
 <style>
     .card {
@@ -30,26 +30,69 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        
     }
 
-    .btn-primary {
-        margin-top: auto;
-        width: 100%;
+    .search-filter-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+    }
+
+        .search-filter-container .input-group,
+        .search-filter-container .form-group {
+            margin-bottom: 10px;
+        }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
     }
 </style>
 
+<h2>Makale Listesi</h2>
+
+<div class="search-filter-container">
+    <form asp-action="Index" method="get">
+        <div class="input-group">
+            <input type="text" name="searchTerm" class="form-control" placeholder="Ara..." value="@Model.SearchTerm" />
+            <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit">Ara</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Etiketler</label>
+            <select asp-for="SelectedTagIds" class="form-control" asp-items="Model.TagsSelectList" multiple="multiple"></select>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" type="submit">Filtrele</button>
+            <a asp-action="Index" class="btn btn-danger">Sıfırla</a>
+        </div>
+    </form>
+</div>
+
 <div class="row">
-    @foreach (var article in Model)
+    @foreach (var article in Model.Articles)
     {
         <div class="col-md-4 mb-4 mt-2">
             <div class="card">
                 <img src="~/images/articles/@article.ImageUrl" class="card-img-top" alt="Article Image">
                 <div class="card-body">
                     <h5 class="card-title">@article.Title</h5>
-                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.Id" class="btn btn-primary">Daha Fazla</a>
+                    <p>@(article.Content.Length > 100 ? article.Content.Substring(0, 100) + "..." : article.Content)</p>
+                    <a asp-controller="Article" asp-action="Details" asp-route-id="@article.Id" class="btn btn-primary" style="margin-top:auto; width:100%;">Daha Fazla</a>
                 </div>
             </div>
         </div>
     }
 </div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchTerm="@Model.SearchTerm" asp-route-selectedTagIds="@string.Join(",", Model.SelectedTagIds)">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

@@ -11,15 +11,12 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
-
     <style>
-
         label.required:after {
             content: "*\00a0";
             color: darkred;
             margin-left: 3px;
         }
-
     </style>
 
 </head>
@@ -29,14 +26,15 @@
             <div class="container">
                 <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                     <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none fw-bold">
-                        Blog Uygulaması 
+                        Blog Uygulaması
                     </a>
-
-
 
                     <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                         <li class="nav-item" style="margin-left:15px">
                             <a class="nav-link text-blue" asp-controller="Article" asp-action="Index">Makale</a>
+                        </li>
+                        <li class="nav-item" style="margin-left:2px">
+                            <a class="nav-link text-blue" asp-controller="User" asp-action="Profile">Profil</a>
                         </li>
                     </ul>
 
@@ -52,24 +50,16 @@
                     }
                     else
                     {
-
                         var firstName = User.GetUserFirstName();
                         var lastName = User.GetUserLastName();
 
                         <div class="d-flex">
-
                             <div class="mt-2">
                                 Hoş Geldin @firstName @lastName
                             </div>
-
-                           
-
                             <a asp-controller="Auth" asp-action="Logout" class="btn btn-outline-danger ms-3">Çıkış Yap</a>
-
                         </div>
-
                     }
-
                 </div>
             </div>
         </header>
@@ -88,11 +78,11 @@
         $('#btnGirisYap').click(function () {
             $('#login').removeClass('d-none');
             $('#welcome').addClass('d-none');
-        })
+        });
         $('#btnIptal').click(function () {
             $('#login').addClass('d-none');
             $('#welcome').removeClass('d-none');
-        })
+        });
     </script>
 
 </body>

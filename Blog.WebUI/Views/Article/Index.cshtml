@@ -1,25 +1,14 @@
-﻿@model List<ArticleInfoDto>
+﻿@model ArticleViewModel
 
 <h2>Makale Listesi</h2>
 
-<form asp-action="Search" method="get" class="mb-3">
-    <div class="input-group">
-        <input type="text" name="searchTerm" class="form-control" placeholder="Ara..." />
-        <button class="btn btn-primary" type="submit">Ara</button>
-    </div>
-</form>
-
-<form asp-action="FilterByTag" method="get" class="mb-3">
-    <div class="input-group">
-        <select name="tagId" class="form-select">
-            @foreach (var tag in ViewBag.Tags as List<TagInfoDto>)
-            {
-                <option value="@tag.Id">@tag.Name</option>
-            }
-        </select>
-        <button class="btn btn-primary" type="submit">Filtrele</button>
-    </div>
-</form>
+<div class="text-end mb-3">
+    <a asp-action="Create" asp-controller="Article" class="btn btn-success">Makale Oluştur</a>
+    @if (User?.IsInRole("Admin") == true)
+    {
+        <a asp-action="Create" asp-controller="Tag" class="btn btn-primary">Etiket Oluştur</a>
+    }
+</div>
 
 <table class="table">
     <thead>
@@ -32,7 +21,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var article in Model)
+        @foreach (var article in Model.Articles)
         {
             <tr>
                 <td>@(article.Title.Length > 10 ? article.Title.Substring(0, 10) + "..." : article.Title)</td>
@@ -46,7 +35,7 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@article.Id" class="btn btn-info">Detay</a>
-                    @if (User.IsInRole("Admin") || article.UserId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
+                    @if (User?.IsInRole("Admin") == true || (User?.Identity?.IsAuthenticated == true && article.UserId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
                     {
                         <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>
                         <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Sil</a>
@@ -56,3 +45,14 @@
         }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

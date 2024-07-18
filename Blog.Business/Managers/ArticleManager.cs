@@ -85,46 +85,6 @@ namespace Blog.Business.Managers
         }
 
 
-        public List<ArticleInfoDto> SearchArticles(string searchTerm)
-        {
-            var articles = _articleRepository.GetAll(a => a.Title.Contains(searchTerm) || a.Content.Contains(searchTerm))
-                .Include(a => a.User)
-                .Include(a => a.ArticleTags)
-                .ThenInclude(at => at.Tag)
-                .Select(article => new ArticleInfoDto
-                {
-                    Id = article.Id,
-                    Title = article.Title,
-                    Content = article.Content,
-                    ImageUrl = article.ImageUrl,
-                    UserName = article.User.FirstName + " " + article.User.LastName,
-                    TagNames = article.ArticleTags.Select(at => at.Tag.Name).ToList()
-                }).ToList();
-
-            return articles;
-        }
-
-        public List<ArticleInfoDto> FilterArticlesByTag(int tagId)
-        {
-            var articles = _articleRepository.GetAll()
-                .Include(a => a.User)
-                .Include(a => a.ArticleTags)
-                .ThenInclude(at => at.Tag)
-                .Where(a => a.ArticleTags.Any(at => at.TagId == tagId))
-                .Select(article => new ArticleInfoDto
-                {
-                    Id = article.Id,
-                    Title = article.Title,
-                    Content = article.Content,
-                    ImageUrl = article.ImageUrl,
-                    UserName = article.User.FirstName + " " + article.User.LastName,
-                    TagNames = article.ArticleTags.Select(at => at.Tag.Name).ToList()
-                }).ToList();
-
-            return articles;
-        }
-
-
         public ArticleInfoDto GetArticleById(int id)
         {
             var article = _articleRepository.GetAll().Include(a => a.User).Include(a => a.ArticleTags).ThenInclude(at => at.Tag).FirstOrDefault(a => a.Id == id);
