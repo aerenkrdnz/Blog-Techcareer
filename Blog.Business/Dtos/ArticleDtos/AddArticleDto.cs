@@ -13,5 +13,7 @@ namespace Blog.Business.Dtos.ArticleDtos
         public string ImageUrl { get; set; }
         public int UserId { get; set; }
         public List<int> TagIds { get; set; } = new List<int>();
+        public List<int> SelectedTagIds { get; set; } = new List<int> ();
+       
     }
 }

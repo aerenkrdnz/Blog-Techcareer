@@ -1,15 +1,15 @@
 ﻿using Blog.Business.Dtos.ArticleDtos;
 using Blog.Business.Services;
+using Blog.WebUI.Extensions;
 using Blog.WebUI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Blog.Business.Dtos.TagDtos;
+using System.IO;
+using System.Linq;
 
 namespace Blog.WebUI.Controllers
 {
@@ -45,7 +45,6 @@ namespace Blog.WebUI.Controllers
             return View(viewModel);
         }
 
-
         [Authorize(Roles = "User,Admin")]
         [HttpPost]
         public IActionResult Create(AddArticleViewModel viewModel)
@@ -58,21 +57,20 @@ namespace Blog.WebUI.Controllers
                 return View(viewModel);
             }
 
-            if (!User.Identity.IsAuthenticated)
+            if (!User.IsLogged())
             {
                 _logger.LogWarning("Kullanıcı kimliği doğrulanmadı.");
                 return RedirectToAction("Register", "Auth");
             }
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            var userId = User.GetUserId();
+            if (userId == 0)
             {
-                _logger.LogError("Kullanıcı kimlik bilgisi bulunamadı. Mevcut kimlikler: " + string.Join(", ", User.Claims.Select(c => $"{c.Type}: {c.Value}")));
+                _logger.LogError("Kullanıcı kimlik bilgisi bulunamadı.");
                 ViewBag.ErrorMessage = "Kullanıcı kimlik bilgisi bulunamadı.";
                 return View(viewModel);
             }
 
-            var userId = int.Parse(userIdClaim.Value);
             _logger.LogInformation($"Kullanıcı ID: {userId}");
 
             var newFileName = "no-images.png";
@@ -110,7 +108,8 @@ namespace Blog.WebUI.Controllers
                 Title = viewModel.Title,
                 Content = viewModel.Content,
                 ImageUrl = newFileName,
-                UserId = userId
+                UserId = userId,
+                TagIds = viewModel.SelectedTagIds 
             };
 
             var result = _articleService.AddArticle(formData);
@@ -139,7 +138,7 @@ namespace Blog.WebUI.Controllers
                 _logger.LogWarning($"Article with ID {id} not found.");
                 return RedirectToAction("Index");
             }
-                       
+
             var tags = _tagService.GetAllTags();
             if (tags == null)
             {
@@ -166,7 +165,6 @@ namespace Blog.WebUI.Controllers
             return View(viewModel);
         }
 
-
         [Authorize(Roles = "User,Admin")]
         [HttpPost]
         public IActionResult Edit(AddArticleViewModel viewModel, int id)
@@ -175,7 +173,7 @@ namespace Blog.WebUI.Controllers
             if (article == null)
             {
                 return RedirectToAction("Index");
-            }                      
+            }
 
             if (!ModelState.IsValid)
             {
@@ -218,7 +216,7 @@ namespace Blog.WebUI.Controllers
                 Title = viewModel.Title,
                 Content = viewModel.Content,
                 ImageUrl = newFileName,
-                TagIds = viewModel.SelectedTagIds ?? new List<int>() 
+                TagIds = viewModel.SelectedTagIds ?? new List<int>()
             };
 
             var result = _articleService.UpdateArticle(formData, id);
@@ -234,12 +232,11 @@ namespace Blog.WebUI.Controllers
             }
         }
 
-
         [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
-            var articles = User.IsInRole("Admin")
+            var userId = User.GetUserId();
+            var articles = User.IsAdmin()
                 ? _articleService.GetAllArticles()
                 : _articleService.GetArticlesByUserId(userId);
 
@@ -254,7 +251,6 @@ namespace Blog.WebUI.Controllers
             {
                 return RedirectToAction("Index");
             }
-                      
 
             var result = _articleService.DeleteArticle(id);
 
@@ -293,7 +289,5 @@ namespace Blog.WebUI.Controllers
 
             return View(article);
         }
-
-
     }
 }

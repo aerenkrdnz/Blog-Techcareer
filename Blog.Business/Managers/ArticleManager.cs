@@ -39,6 +39,7 @@ namespace Blog.Business.Managers
             };
 
             _articleRepository.Add(entity);
+            
 
             if (addArticleDto.TagIds != null)
             {
@@ -50,6 +51,7 @@ namespace Blog.Business.Managers
                         TagId = tagId
                     });
                 }
+               
             }
 
             return new ServiceMessage() { IsSucceed = true };
