@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blog.Business.Dtos.CommentDtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Blog.Business.Dtos.ArticleDtos
         public List<string> TagNames { get; set; }
         public List<int> TagIds { get; set; }
         public int UserId { get; set; }
+        public List<CommentInfoDto> Comments { get; set; }
     }
 }
 

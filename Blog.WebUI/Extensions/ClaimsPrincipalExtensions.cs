@@ -31,5 +31,10 @@ namespace Blog.WebUI.Extensions
             else
                 return false;
         }
+        public static int GetUserId(this ClaimsPrincipal user)
+        {
+            var userIdClaim = user.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+        }
     }
 }

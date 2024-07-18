@@ -1,10 +1,12 @@
 ﻿@model ArticleViewModel
+@using System.Security.Claims;
+@using Blog.WebUI.Extensions;
 
 <h2>Makale Listesi</h2>
 
 <div class="text-end mb-3">
     <a asp-action="Create" asp-controller="Article" class="btn btn-success">Makale Oluştur</a>
-    @if (User?.IsInRole("Admin") == true)
+    @if (User.IsAdmin())
     {
         <a asp-action="Create" asp-controller="Tag" class="btn btn-primary">Etiket Oluştur</a>
     }
@@ -35,7 +37,7 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@article.Id" asp-route-title="@article.Title.Replace(" ", "-").Replace("'", "").ToLower()" class="btn btn-info">Detay</a>
-                    @if (User?.IsInRole("Admin") == true || (User?.Identity?.IsAuthenticated == true && article.UserId == int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value)))
+                    @if (User.IsAdmin() || (User.IsLogged() && article.UserId == User.GetUserId()))
                     {
                         <a asp-action="Edit" asp-route-id="@article.Id" class="btn btn-warning">Düzenle</a>
                         <a asp-action="Delete" asp-route-id="@article.Id" class="btn btn-danger">Sil</a>
