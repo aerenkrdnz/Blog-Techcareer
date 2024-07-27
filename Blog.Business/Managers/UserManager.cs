@@ -39,7 +39,7 @@ namespace Blog.Business.Managers
                 LastName = addUserDto.LastName,
                 Password = _dataProtector.Protect(addUserDto.Password),
                 UserType = UserTypeEnum.User,
-                ProfileImageUrl = addUserDto.ProfileImageUrl
+                ProfileImageUrl = string.IsNullOrEmpty(addUserDto.ProfileImageUrl) ? "blank-profile-picture-973460_1280-71164ad6-22e1-4bd0-ac74-4a17fc154c5f.png" : addUserDto.ProfileImageUrl
             };
 
             _userRepository.Add(entity);
