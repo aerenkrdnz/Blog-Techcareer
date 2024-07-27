@@ -38,7 +38,8 @@ namespace Blog.Business.Managers
                 FirstName = addUserDto.FirstName,
                 LastName = addUserDto.LastName,
                 Password = _dataProtector.Protect(addUserDto.Password),
-                UserType = UserTypeEnum.User
+                UserType = UserTypeEnum.User,
+                ProfileImageUrl = addUserDto.ProfileImageUrl
             };
 
             _userRepository.Add(entity);
